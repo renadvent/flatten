@@ -17,7 +17,6 @@ echo
 #this makes 'for fileList in "($find...)"' work by changing split from ' ' (space) to '\n'
 #... or was it spaces in variable file names? idr
 
-
 #flat mode
 if [ "$active_mode" = flat ]; then
 
@@ -147,8 +146,6 @@ else
     echo "invalid active_mode"
     exit 1
 fi
-
-
 
 counter=0
 subcounter=0 #to drop "unary operator expected" warning
