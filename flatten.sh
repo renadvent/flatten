@@ -19,8 +19,8 @@ if [ "$active_mode" = flat ]; then
 
     #read arguments/set source and target directories
     if [ $# = 1 ]; then
-       read -p -r "enter full source directory: " sourceDir
-       read -p -r "enter full destination directory: " destDir
+       read -r -p "enter full source directory: " sourceDir
+       read -r -p "enter full destination directory: " destDir
     elif [ $# = 2 ]; then
         sourceDir=$2
         read -p "enter full destination directory: " destDir
@@ -71,10 +71,10 @@ if [ "$active_mode" = flat ]; then
 elif [ "$active_mode" = check ]; then
 
     if [ $# = 1 ]; then
-        read -p -r "enter source directory: " sourceDir
+        read -r -p "enter source directory: " sourceDir
     elif [ $# = 2 ]; then
         #IFS=0
-        sourceDir=${$2}#dropping slashes....
+        sourceDir=$2 #dropping slashes....
         #IFS=$'\n'
     else
         echo "invalid check arguments"
@@ -91,7 +91,7 @@ elif [ "$active_mode" = revert ]; then #revert code
 
     #read arguments/get revert file
     if [ $# -eq 1 ]; then
-        read -p -r "enter revert file: " revertTo
+        read -r -p "enter revert file: " revertTo
     elif [ $# -eq 2 ]; then
         revertTo=$2 #second arg is revert file
     else 
@@ -146,6 +146,9 @@ else
     exit 1
 fi
 
+counter=0
+subcounter=0 #to drop unary operator expected warning
+
 #sort through files
 for thisType in ${fileTypes[@]}; do
     echo "looking for $thisType files..."
@@ -163,7 +166,7 @@ for thisType in ${fileTypes[@]}; do
         done
 
         #check how many files found of current type
-        if [ $subcounter -eq 0 ]; then
+        if [ $subcounter = 0 ]; then
             echo "none"
         else
             echo "$subcounter files found"
