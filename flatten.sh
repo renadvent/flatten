@@ -1,9 +1,13 @@
 #description: moves specific file types from a file hierarchy (such as google photos takeout) into a single, specified, folder
 
+#functionality to be added to deal with duplicates
+#   --move duplicate items to a separate folder? or rename?
+#       --check if file name already exists in destDir, and if it does, create a new folder named "duplicates" and move subsequent there
+
 #file types that will be moved
 fileTypes=("*.jpg" "*.jpeg" "*.mov" "*.png" "*.heic" "*.cr2" "*.tif" "*.psd" "*.dng" "*.xmp" "*.mp4" "*.3gp" "*.gif") 
 
-if [ $# -eq 0 ]; then #if no arguments, prompt for
+if [ $# -eq 0 ]; then #if no arguments, prompt for mode
     read -p "mode (flat/check/revert/test or help): " active_mode
 else
     active_mode=$1;
@@ -12,7 +16,7 @@ echo
 
 #this makes 'for fileList in "($find...)"' work by changing split from ' ' (space) to '\n'
 #... or was it spaces in variable file names? idr
-IFS=$'\n'
+
 
 #flat mode
 if [ "$active_mode" = flat ]; then
@@ -23,12 +27,12 @@ if [ "$active_mode" = flat ]; then
        read -r -p "enter full destination directory: " destDir
     elif [ $# = 2 ]; then
         sourceDir=$2
-        read -p "enter full destination directory: " destDir
+        read -r -p "enter full destination directory: " destDir
     elif [ $# = 3 ]; then  
         sourceDir=$1
         destDir=$2
     else
-        echo "invalid flat mode arguments"
+        echo "invalid number of flat mode arguments"
         echo "format: flat (optional)source_Directory (optional)destination_Directory"
         exit 1
     fi
@@ -36,7 +40,7 @@ if [ "$active_mode" = flat ]; then
     #create source directory if necessary
     if [ ! -d "$destDir" ]; then #if directory does not exist
         mkdir "$destDir"
-        if [ $? -eq 0 ]; then
+        if [ $? -eq 0 ]; then #check if made successfully
             echo "created directory"
         else
             echo "failed to create directory"
@@ -73,9 +77,7 @@ elif [ "$active_mode" = check ]; then
     if [ $# = 1 ]; then
         read -r -p "enter source directory: " sourceDir
     elif [ $# = 2 ]; then
-        #IFS=0
         sourceDir=$2 #dropping slashes....
-        #IFS=$'\n'
     else
         echo "invalid check arguments"
         exit 1
@@ -95,7 +97,7 @@ elif [ "$active_mode" = revert ]; then #revert code
     elif [ $# -eq 2 ]; then
         revertTo=$2 #second arg is revert file
     else 
-        echo "invalid arguments"
+        echo "invalid number of arguments"
         exit 1
     fi
 
@@ -145,6 +147,8 @@ else
     echo "invalid active_mode"
     exit 1
 fi
+
+IFS=$'\n'
 
 counter=0
 subcounter=0 #to drop unary operator expected warning
