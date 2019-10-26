@@ -148,16 +148,21 @@ else
     exit 1
 fi
 
-IFS=$'\n'
+
 
 counter=0
-subcounter=0 #to drop unary operator expected warning
+subcounter=0 #to drop "unary operator expected" warning
+
+IFS=$'\n' #required so space doesn't break file names in variables for "for" loops
 
 #sort through files
-for thisType in ${fileTypes[@]}; do
+for thisType in ${fileTypes[@]}; do #loop file types
     echo "looking for $thisType files..."
-    for fileList in "$(find "$sourceDir" -mindepth 1 -iname $thisType)"; do
+    for fileList in "$(find "$sourceDir" -mindepth 1 -iname $thisType)"; do #IFS set fixes this
+        #echo $fileList
         for file in $fileList; do
+
+            echo $file
 
             counter=$((counter+1)) #counter for total number of files of type(s) found
             subcounter=$((subcounter+1)) #counter for current number of type found
@@ -190,7 +195,7 @@ echo
 
 if [ "$active_mode" = flat ]; then  
 
-    echo "Run this to revert: "
+    echo "Run this command to revert: "
     echo "./flatten.sh revert \"$reversalLog\""
 
 fi
