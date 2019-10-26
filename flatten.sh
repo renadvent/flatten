@@ -11,15 +11,15 @@
 
 fileTypes=("*.jpg" "*.jpeg" "*.mov" "*.png" "*.heic" "*.cr2" "*.tif" "*.psd" "*.dng" "*.xmp" "*.mp4" "*.3gp" "*.gif") 
 
-#sourceDir="C:\Users\erick\OneDrive\Pictures\Photography\Google Photos\SORT"
-sourceDir="C:/Users/erick/OneDrive/Pictures/Photography" #/Google Photos"
+sourceDir="C:\Users\erick\OneDrive\Pictures\Photography\Google Photos\SORT"
+#sourceDir="C:/Users/erick/OneDrive/Pictures/Photography" #/Google Photos"
 destDir="C:/Users/erick/OneDrive/Pictures/Photography/Google Photos 2"
 
 
 #new
 if [ $# -eq 0 ]; then #if no arguments, prompt for
     read -p "mode (flat/check/revert or help): " active_mode
-elif [ $# -eq 1 ]; then #if 1 agument, set mode to it
+else
     active_mode=$1;
 fi
 
@@ -74,6 +74,7 @@ if [ "$active_mode" = flat ]; then
     fi
 
     echo "active_mode is set flat... moving files"
+    echo
     echo "source directory: $sourceDir"
     echo "destination directory $destDir"
     echo
@@ -81,6 +82,7 @@ if [ "$active_mode" = flat ]; then
 #if in test mode, just look at find files
 elif [ "$active_mode" = check ]; then
     echo "activeMode is set check... not moving files"
+    echo
     echo "looking for files in $sourceDir"
     echo
 
@@ -90,9 +92,9 @@ elif [ "$active_mode" = revert ]; then #revert code
 
     #if $# = 2 arguments, no need to prompt. $1=active_mode=revert, $2=revert file
 
-    if [ $# -ne 2 ]; then
+    if [ $# -eq 1 ]; then
         read -p "enter revert file: " revertTo
-    elif [ $# eq 2]; then
+    elif [ $# -eq 2 ]; then
         revertTo=$2 #second arg is revert file
     else 
         echo "invalid arguments"
