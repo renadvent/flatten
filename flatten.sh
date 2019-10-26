@@ -1,3 +1,5 @@
+#description: moves specific file types from a file hierarchy (such as google photos takeout) into a single, specified, folder
+
 #do not run script from same path as destination directory
 #revert file must be in same directory flattened
 
@@ -5,11 +7,21 @@
 
 #made to move pictures from a google photos takeout to a single folder
 
+#getopts
+
 fileTypes=("*.jpg" "*.jpeg" "*.mov" "*.png" "*.heic" "*.cr2" "*.tif" "*.psd" "*.dng" "*.xmp" "*.mp4" "*.3gp" "*.gif") 
 
-sourceDir="C:\Users\erick\OneDrive\Pictures\Photography\Google Photos\SORT"
-#sourceDir="C:/Users/erick/OneDrive/Pictures/Photography/Google Photos"
+#sourceDir="C:\Users\erick\OneDrive\Pictures\Photography\Google Photos\SORT"
+sourceDir="C:/Users/erick/OneDrive/Pictures/Photography" #/Google Photos"
 destDir="C:/Users/erick/OneDrive/Pictures/Photography/Google Photos 2"
+
+
+#new
+if [ $# -eq 0 ]; then #if no arguments, prompt for
+    read -p "mode (flat/check/revert or help): " active_mode
+elif [ $# -eq 1 ]; then #if 1 agument, set mode to it
+    active_mode=$1;
+fi
 
 counter=0
 subcounter=0
@@ -18,7 +30,7 @@ subcounter=0
 #... or was it spaces in variable file names? idr
 IFS=$'\n'
 
-active_mode=$1;
+
 
 list=""
 
@@ -26,6 +38,14 @@ echo
 
 #mode
 if [ "$active_mode" = flat ]; then
+
+    #if $# = 3 arguments, no need to prompt 1=active_mode=flat, 2=source, 3=dest
+
+    #if directories not provided in argument pass
+    #   read -p "enter full source directory: " sourceDir
+    #   read -p "enter full destination directory: " destDir
+    #else #default
+    #fi
 
     if [ ! -d "$destDir" ]; then #if directory does not exist
         mkdir "$destDir"
@@ -44,7 +64,8 @@ if [ "$active_mode" = flat ]; then
     ident=$(basename $destDir)
     reversalLog="$destDir/reversal-Log-$ident-$random.txt"
     
-    touch $reversalLog
+    touch $reversalLog #create log
+
     if [ $? -eq 0 ]; then
         echo "created log at $reversalLog"
     else
@@ -52,7 +73,7 @@ if [ "$active_mode" = flat ]; then
         exit 1
     fi
 
-    echo "active_mode is set move... moving files"
+    echo "active_mode is set flat... moving files"
     echo "source directory: $sourceDir"
     echo "destination directory $destDir"
     echo
@@ -62,17 +83,28 @@ elif [ "$active_mode" = check ]; then
     echo "activeMode is set check... not moving files"
     echo "looking for files in $sourceDir"
     echo
-elif [ "$active_mode" = revert ]; then
+
+elif [ "$active_mode" = revert ]; then #revert code
 
     echo "activeMode is set to revert... reversing moves"
-    
-    revertTo=$2 #second arg is revert file
 
-    flatDir=$(dirname $revertTo)
+    #if $# = 2 arguments, no need to prompt. $1=active_mode=revert, $2=revert file
+
+    if [ $# -ne 2 ]; then
+        read -p "enter revert file: " revertTo
+    elif [ $# eq 2]; then
+        revertTo=$2 #second arg is revert file
+    else 
+        echo "invalid arguments"
+        exit 1
+    fi
+
+    flatDir=$(dirname $revertTo) #get the directory of the revert file
 
     revertCount=0
 
     while read -r line; do #read file paths to move file
+
         if [ -z $line ]; then #check for empty line
             continue
         fi
@@ -80,10 +112,11 @@ elif [ "$active_mode" = revert ]; then
         fName=$(basename "$line")
         fPath=$(dirname "$line")
 
-        mv -n -v "$flatDir/$fName" "$fPath"
+        mv -n -v "$flatDir/$fName" "$fPath" #don't overwrite
 
         revertCount=$((revertCount+1))
-    done < $revertTo
+
+    done < $revertTo #feed file to loop
 
     echo "reversed $revertCount files"
 
@@ -109,7 +142,7 @@ for thisType in ${fileTypes[@]}; do
             subcounter=$((subcounter+1)) #counter for current number of type found
 
             if [ "$active_mode" = flat ]; then
-                list=$list$file$'\n' #add file to list of files mmoved
+                list=$list$file$'\n' #add file to list string of files mmoved
                 mv -n -v "$file" "$destDir"
             fi
             
